@@ -1,0 +1,60 @@
+---
+title: "R Notebook"
+output: 
+  html_notebook:
+    toc: TRUE
+    code_folding: show
+    highlight: kate
+---
+
+
+```{r setup}
+library(ggplot2)
+```
+
+```{r}
+data.frame(
+  x = c(10, 80, 10, 50),
+  y = c(90, 90, 283, 283),
+  cit = c("a", "a", "b", "b"),
+  position = c("start", "end", "start", "end")
+) -> lines
+
+lines[which(lines$position == "end"), ] -> points
+
+ggplot() +
+  geom_vline(xintercept = 10) +
+  geom_line(
+    data = lines,
+    aes(x = x, y = y, group = cit)
+  ) + 
+  geom_point(
+    data = points,
+    aes(x = x, y = y, fill = cit),
+    shape = 21,
+    size = 6,
+    stroke = 0.75
+  ) +
+  geom_text(
+    data = points,
+    aes(x = x, y = y, label = cit),
+    size = 4
+  ) +
+  xlim(c(0, 100)) +
+  ylim(c(0, 360)) +
+  coord_polar("y") -> base
+
+base
+```
+
+```{r}
+base + 
+  theme_void() +
+  theme(
+    legend.position = "none"
+  ) 
+```
+
+
+
+

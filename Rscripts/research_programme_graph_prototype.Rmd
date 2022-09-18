@@ -13,48 +13,90 @@ library(ggplot2)
 ```
 
 ```{r}
+layers = 3
+diameter.main_circle = 20
+diameter.step = 5
+
 data.frame(
-  x = c(10, 80, 10, 50),
-  y = c(90, 90, 283, 283),
+  y = 1:layers,
+  fill = LETTERS[1:layers]
+) -> layers
+
+layers$y = (rev(layers$y) * diameter.step) + diameter.main_circle
+
+layers
+```
+
+```{r}
+data.frame(
+  x = c(90, 90, 283, 283),
+  y = c(diameter.main_circle, 80, diameter.main_circle, 50),
   cit = c("a", "a", "b", "b"),
   position = c("start", "end", "start", "end")
 ) -> lines
+lines
+```
 
+
+```{r}
 lines[which(lines$position == "end"), ] -> points
+points
+```
 
+```{r}
 ggplot() +
-  geom_vline(xintercept = 10) +
+  # main circle
+  geom_rect(
+    aes(ymin = 0, ymax = diameter.main_circle,
+        xmin = 0, xmax = 360),
+    fill = "white"
+  ) +
+  geom_hline(
+    yintercept = diameter.main_circle,
+    size = 2
+  ) +
+  # lines of evidence
   geom_line(
     data = lines,
-    aes(x = x, y = y, group = cit)
+    aes(x = x,
+        y = y,
+        group = cit)
   ) + 
+  # points of evidence
   geom_point(
     data = points,
-    aes(x = x, y = y, fill = cit),
+    aes(x = x,
+        y = y,
+        fill = cit),
     shape = 21,
     size = 6,
     stroke = 0.75
   ) +
+  # text labels of points of evidence
   geom_text(
     data = points,
-    aes(x = x, y = y, label = cit),
+    aes(x = x,
+        y = y,
+        label = cit),
     size = 4
   ) +
-  xlim(c(0, 100)) +
-  ylim(c(0, 360)) +
-  coord_polar("y") -> base
+  # protective layers
+  geom_rect(
+    data = layers,
+    aes(
+      fill = fill,
+      ymin = diameter.main_circle + 1,
+      ymax = y,
+      xmin = 0,
+      xmax = 360
+      )
+  ) +
+  coord_polar() -> base
 
-base
-```
-
-```{r}
-base + 
+base +
   theme_void() +
   theme(
     legend.position = "none"
-  ) 
+  ) +
+  annotate("text", label = "Theory 1", x = 0, y = 0, size = 4)
 ```
-
-
-
-

@@ -13,34 +13,32 @@ library(ggplot2)
 ```
 
 ```{r}
-layers = 3
-diameter.main_circle = 20
-diameter.step = 5
-
-data.frame(
-  y = 1:layers,
-  fill = LETTERS[1:layers]
-) -> layers
-
-layers$y = (rev(layers$y) * diameter.step) + diameter.main_circle
-
-layers
+library(openxlsx)
+read.xlsx("../testdata/input.xlsx") -> df.input
+df.input
 ```
 
 ```{r}
-data.frame(
-  x = c(90, 90, 283, 283),
-  y = c(diameter.main_circle, 80, diameter.main_circle, 50),
-  cit = c("a", "a", "b", "b"),
-  position = c("start", "end", "start", "end")
-) -> lines
+df.input[which(df.input == "evidence"), ] -> points
+points[["position"]] <- "end"
+points
+```
+
+
+```{r}
+diameter.main_circle = max(points[["length"]]) / 5
+points -> lines.starts
+lines.starts[["position"]] <- "start"
+lines.starts[["length"]] <- diameter.main_circle
+rbind(lines.starts, points) -> lines
 lines
 ```
 
-
 ```{r}
-lines[which(lines$position == "end"), ] -> points
-points
+df.input[which(df.input == "layer"), ] -> layers
+layers[["length.max"]] <- cumsum(layers[["length"]]) + diameter.main_circle
+layers[["length.min"]] <- layers[["length.max"]] - layers[["length"]]
+layers
 ```
 
 ```{r}
@@ -53,42 +51,46 @@ ggplot() +
   ) +
   geom_hline(
     yintercept = diameter.main_circle,
-    size = 2
+    size = 1
   ) +
   # lines of evidence
   geom_line(
     data = lines,
-    aes(x = x,
-        y = y,
-        group = cit)
+    aes(x = angle,
+        y = length,
+        group = label)
   ) + 
   # points of evidence
   geom_point(
     data = points,
-    aes(x = x,
-        y = y,
-        fill = cit),
+    aes(x = angle,
+        y = length,
+        fill = label),
     shape = 21,
     size = 6,
     stroke = 0.75
   ) +
+  scale_fill_manual(
+    values = df.input[["color"]],
+    labels = df.input[["label"]]
+  ) +
   # text labels of points of evidence
   geom_text(
     data = points,
-    aes(x = x,
-        y = y,
-        label = cit),
+    aes(x = angle,
+        y = length,
+        label = label),
     size = 4
   ) +
   # protective layers
   geom_rect(
     data = layers,
     aes(
-      fill = fill,
-      ymin = diameter.main_circle + 1,
-      ymax = y,
+      ymin = length.min,
+      ymax = length.max,
       xmin = 0,
-      xmax = 360
+      xmax = 360,
+      fill = color
       )
   ) +
   coord_polar() -> base

@@ -103,7 +103,7 @@ plotter_fun <- function(programme.name = "",
                   ymax = length.max,
                   xmin = 0,
                   xmax = 360,
-                  fill = color
+                  fill = label
                 )) +
       # text labels of layers
       geom_text(data = layers,
@@ -116,8 +116,6 @@ plotter_fun <- function(programme.name = "",
   }
   
   plot.diagram +
-    #scale_fill_manual(values = df.input[["color"]],
-    #                  labels = df.input[["label"]]) +
     coord_polar() +
     theme_void() +
     theme(legend.position = "none") +

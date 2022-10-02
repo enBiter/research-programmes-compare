@@ -1,0 +1,43 @@
+---
+title: "Graphical comparison of research programmes"
+output: github_document
+---
+
+```{r setup}
+library(ggplot2)
+library(openxlsx)
+source("Rscripts/RPC_functions.R")
+```
+
+### 1. Read xlsx file with manual test data about label sizes and positions.
+
+```{r}
+read.xlsx("testdata/input1.xlsx") -> theory1
+theory1
+```
+
+### 2. Plot diagram based on the data:
+
+```{r}
+plot.curcular.diagram(input = theory1,
+                      programme.name = "P1") -> p1
+p1
+```
+
+### 3. Load and plot the data from second file.
+
+```{r}
+read.xlsx("testdata/input2.xlsx") -> theory2
+
+plot.curcular.diagram(input = theory2,
+                      programme.name = "P2") -> p2
+p2
+```
+
+### 4. Combine the plots together
+
+```{r}
+library(patchwork)
+
+p1 + p2
+```

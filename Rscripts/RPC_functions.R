@@ -1,3 +1,33 @@
+if(!require("readxl", quietly = TRUE)) {
+  install.packages("readxl", repos='http://cran.us.r-project.org')
+}
+if(!require("ggplot2", quietly = TRUE)) {
+  install.packages("ggplot2", repos='http://cran.us.r-project.org')
+}
+library(readxl)
+library(ggplot2)
+
+process.files <- function(folder, files) {
+  for(f in files){
+    normalizePath(folder) -> folder
+    f -> file.name
+    paste(folder, file.name, sep = "/") -> file.path
+    read_excel(file.path) -> input.df
+    gsub(".xls.$", "", file.name) -> plot.name
+    paste0(folder, "/", plot.name, ".png") -> new.file
+    png(
+      new.file,
+      bg = "white")
+    print(plot.curcular.diagram(input.df, plot.name))
+    dev.off()
+    if (file.exists(new.file)) {
+      cat(gsub("^.+/", "", new.file), "created!\n")
+    } else {
+      cat("Something is wrong with file", plot.name, "\n")
+    }
+  }
+}
+
 plot.curcular.diagram <-
   function(input = df.input,
            programme.name = "") {
